@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<style type="text/css">
+  @media handheld{
+  .issues{
+    display: none;
+  }
+  .avatar{
+    display: none;
+  }
+  .private{
+    display: none;
+  }
+  .link{
+    display: none;
+  }
+}
+#customers {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
+</style>
+<script>
+function sortTable() {
+  var table, rows, switching, i, x, y, shouldSwitch;
+  table = document.getElementById("customers");
+  switching = true;
+  /*Make a loop that will continue until
+  no switching has been done:*/
+  while (switching) {
+    //start by saying: no switching is done:
+    switching = false;
+    rows = table.getElementsByTagName("TR");
+    /*Loop through all table rows (except the
+    first, which contains table headers):*/
+    for (i = 1; i < (rows.length - 1); i++) {
+      //start by saying there should be no switching:
+      shouldSwitch = false;
+      /*Get the two elements you want to compare,
+      one from current row and one from the next:*/
+      x = rows[i].getElementsByTagName("TD")[0];
+      y = rows[i + 1].getElementsByTagName("TD")[0];
+      //check if the two rows should switch place:
+      if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+        //if so, mark as a switch and break the loop:
+        shouldSwitch= true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      /*If a switch has been marked, make the switch
+      and mark that a switch has been done:*/
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+}
+</script>
+
+
+</head>
+<body>
+
+<p><button onclick="sortTable()">Sort</button></p> 
+
+<div ng-app="myApp" ng-controller="customersCtrl"> 
+
+    <table id="customers" onload="sortTable()">
+      <tr>
+       <th class="name">Project name</th>
+       <th class="author">Author</th>
+       <th class="stars">Number of stars</th>
+       <th class="issues">Number of issues</th>
+       <th class="avatar">Avatar (if exist)</th>
+       <th class="private">Private or Public</th>
+       <th class="link">Link to repo</th>
+    </tr> 
+
+    <tr ng-repeat="x in myData">
+        <td class="name">{{ x.full_name }}</td>
+        <td class="author">{{x.owner.login}} </td>
+        <td class="stars"> {{x.watchers}} </td>
+        <td class="issues">{{x.open_issues_count}} </td>
+        <td class="avatar">{{x.owner.avatar_url}} </td>
+        <td class="private">{{x.private}}</td>
+        <td class="link"> {{x.html_url}}  </td>
+      </tr>
+    </table>
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('customersCtrl', function($scope, $http) {
+  $http.get("https://api.github.com/search/repositories?q=angular").then(function (response) {
+      $scope.myData = response.data.items;
+  });
+});
+</script>
+
+</body >
+</html>
